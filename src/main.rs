@@ -6,6 +6,7 @@ mod config;
 mod registry;
 mod theme;
 mod ui;
+mod icons;
 
 use app::BrowserPicker;
 use eframe::egui;

@@ -87,4 +87,4 @@ impl BrowserPicker {
             });
         });
     }
-} 
+}

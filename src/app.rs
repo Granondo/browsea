@@ -2,6 +2,7 @@ use crate::browser::{self, extract_domain};
 use crate::config::Config;
 use eframe::{egui, epaint};
 use crate::theme::Theme;
+use crate::icons;
 
 pub struct BrowserPicker {
     pub browsers: Vec<(String, String, Option<egui::TextureHandle>)>,
@@ -34,7 +35,7 @@ impl BrowserPicker {
         
         // Load icons for each browser
         for (name, path) in browsers_info {
-            let icon = Self::load_browser_icon(&path, &cc.egui_ctx);
+            let icon = icons::load_browser_icon(&name, &path, &cc.egui_ctx);
             picker.browsers.push((name, path, icon));
         }
         
@@ -54,10 +55,6 @@ impl BrowserPicker {
             .insert(0, "segoe".to_owned());
         
         ctx.set_fonts(fonts);
-    }
-    
-    fn load_browser_icon(_path: &str, _ctx: &egui::Context) -> Option<egui::TextureHandle> {
-        None
     }
 
     pub fn check_domain_preference(&self) -> Option<String> {
@@ -104,4 +101,4 @@ impl eframe::App for BrowserPicker {
             }
         });
     }
-} 
+}
