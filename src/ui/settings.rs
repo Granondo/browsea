@@ -33,45 +33,7 @@ impl BrowserPicker {
                     }
                 }
             }
-            
-            ui.add_space(10.0);
-            
-            // Default browser setting
-            ui.label("Default Browser:");
-            egui::ComboBox::from_id_source("default_browser")
-                .selected_text(self.config.default_browser.clone().unwrap_or_else(|| "None".to_string()))
-                .show_ui(ui, |ui| {
-                    ui.selectable_value(&mut self.config.default_browser, None, "None");
-                    for (name, _, _) in &self.browsers {
-                        ui.selectable_value(&mut self.config.default_browser, Some(name.clone()), name);
-                    }
-                });
-            
-            // Remember choice setting
-            ui.checkbox(&mut self.config.remember_choice_for_domain, "Remember browser choice for each website");
-            
-            ui.add_space(10.0);
-            
-            // Domain preferences
-            if !self.config.domain_preferences.is_empty() {
-                ui.label("Domain Preferences:");
-                ui.add_space(5.0);
-                
-                let mut domains_to_remove = Vec::new();
-                
-                for (domain, browser) in &self.config.domain_preferences {
-                    ui.horizontal(|ui| {
-                        ui.label(format!("{}: {}", domain, browser));
-                        if ui.button("Remove").clicked() {
-                            domains_to_remove.push(domain.clone());
-                        }
-                    });
-                }
-                
-                for domain in domains_to_remove {
-                    self.config.domain_preferences.remove(&domain);
-                }
-            }
+        
             
             ui.add_space(10.0);
             

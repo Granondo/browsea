@@ -59,22 +59,6 @@ impl BrowserPicker {
                                 },
                             );
                         }
-                        
-                        if response.clicked() {
-                            // Save preference if enabled
-                            if self.config.remember_choice_for_domain {
-                                if let Some(domain) = crate::browser::extract_domain(&self.url) {
-                                    self.config.domain_preferences.insert(domain.clone(), name.clone());
-                                    self.config.save().ok();
-                                }
-                            }
-                            
-                            Command::new(path)
-                                .arg(&self.url)
-                                .spawn()
-                                .ok();
-                            frame.close();
-                        }
                     });
                     
                     ui.add_space(8.0); // Space between browser icons

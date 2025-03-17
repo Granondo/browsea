@@ -1,4 +1,4 @@
-use crate::browser::{self, extract_domain};
+use crate::browser::{self};
 use crate::config::Config;
 use eframe::{egui, epaint};
 use crate::theme::Theme;
@@ -55,15 +55,6 @@ impl BrowserPicker {
             .insert(0, "segoe".to_owned());
         
         ctx.set_fonts(fonts);
-    }
-
-    pub fn check_domain_preference(&self) -> Option<String> {
-        if self.config.remember_choice_for_domain {
-            if let Some(domain) = extract_domain(&self.url) {
-                return self.config.domain_preferences.get(&domain).cloned();
-            }
-        }
-        self.config.default_browser.clone()
     }
 }
 

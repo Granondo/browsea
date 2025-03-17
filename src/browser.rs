@@ -103,12 +103,3 @@ fn check_filesystem_browsers(browsers: &mut Vec<(String, String)>, program_files
         }
     }
 }
-
-pub fn extract_domain(url: &str) -> Option<String> {
-    if let Some(url) = url.strip_prefix("http://") {
-        return url.split('/').next().map(|s| s.to_string());
-    } else if let Some(url) = url.strip_prefix("https://") {
-        return url.split('/').next().map(|s| s.to_string());
-    }
-    None
-} 

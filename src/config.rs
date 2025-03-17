@@ -6,9 +6,6 @@ use std::path::PathBuf;
 
 #[derive(Serialize, Deserialize, Default)]
 pub struct Config {
-    pub default_browser: Option<String>,
-    pub remember_choice_for_domain: bool,
-    pub domain_preferences: HashMap<String, String>,
     pub custom_browsers: Vec<(String, String)>,
 }
 
