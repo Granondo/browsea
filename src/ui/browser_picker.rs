@@ -1,6 +1,6 @@
 use crate::app::BrowserPicker;
+use crate::browser_launcher;
 use eframe::egui;
-use std::process::Command;
 
 impl BrowserPicker {
     pub fn show_browser_picker_ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
@@ -21,7 +21,8 @@ impl BrowserPicker {
             
             // Browser buttons with icons
             ui.horizontal_wrapped(|ui| {
-                for (name, path, icon) in &self.browsers {
+                for (i, (name, path, icon)) in self.browsers.iter().enumerate() {
+                    let browser_index = i; // Store index for click handler
                     ui.vertical(|ui| {
                         let mut response = if let Some(icon) = icon {
                             // Use icon if available
@@ -58,6 +59,16 @@ impl BrowserPicker {
                                     egui::Color32::from_black_alpha(10)
                                 },
                             );
+                        }
+                        
+                        // Handle click event to launch browser
+                        if response.clicked() {
+                            if let Some((_, browser_path, _)) = self.browsers.get(browser_index) {
+                                if let Err(e) = browser_launcher::launch_browser(browser_path, &self.url) {
+                                    eprintln!("{}", e);
+                                }
+                                frame.close();
+                            }
                         }
                     });
                     

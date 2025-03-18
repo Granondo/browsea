@@ -2,6 +2,7 @@
 
 mod app;
 mod browser;
+mod browser_launcher;
 mod config;
 mod registry;
 mod theme;

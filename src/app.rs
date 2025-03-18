@@ -46,7 +46,7 @@ impl BrowserPicker {
         let mut fonts = egui::FontDefinitions::default();
         fonts.font_data.insert(
             "segoe".to_owned(),
-            egui::FontData::from_static(include_bytes!("../assets/segoe-ui.ttf")),
+            egui::FontData::from_static(include_bytes!("assets/fonts/segoe-ui.ttf")),
         );
         
         fonts.families
