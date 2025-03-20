@@ -48,23 +48,37 @@ fn main() {
 }
 
 fn load_icon() -> Option<eframe::IconData> {
-    let icon_path = PathBuf::from("src/assets/app_icon/app_icon.png");
+    // Try multiple possible locations for the app icon
+    let possible_paths = vec![
+        PathBuf::from("src/assets/app_icon/app_icon.png"),
+        PathBuf::from("assets/app_icon/app_icon.png"),
+    ];
     
-
-    
-    if let Ok(image) = image::open(&icon_path) {
-        println!("Successfully loaded icon image");
-        let image = image.to_rgba8();
-        let (width, height) = image.dimensions();
-        let rgba = image.into_raw();
-        
-        Some(eframe::IconData {
-            rgba,
-            width,
-            height,
-        })
-    } else {
-        eprintln!("Failed to load application icon from: {:?}", icon_path);
-        None
+    // Add paths relative to the executable location
+    let mut exe_paths = Vec::new();
+    if let Ok(exe_path) = std::env::current_exe() {
+        if let Some(exe_dir) = exe_path.parent() {
+            exe_paths.push(exe_dir.join("src/assets/app_icon/app_icon.png"));
+            exe_paths.push(exe_dir.join("assets/app_icon/app_icon.png"));
+        }
     }
+    
+    // Try to find and load the icon from any of the possible locations
+    for path in possible_paths.iter().chain(exe_paths.iter()) {
+        if let Ok(image) = image::open(path) {
+            println!("Successfully loaded icon image from: {:?}", path);
+            let image = image.to_rgba8();
+            let (width, height) = image.dimensions();
+            let rgba = image.into_raw();
+            
+            return Some(eframe::IconData {
+                rgba,
+                width,
+                height,
+            });
+        }
+    }
+    
+    eprintln!("Failed to load application icon from any location");
+    None
 }

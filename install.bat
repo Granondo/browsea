@@ -53,6 +53,18 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
+:: Copy assets folders if they exist
+echo Copying assets...
+if exist "assets" (
+    if not exist "%ProgramFiles%\BrowserPicker\assets" mkdir "%ProgramFiles%\BrowserPicker\assets"
+    xcopy /E /I /Y assets "%ProgramFiles%\BrowserPicker\assets" >nul
+)
+
+if exist "src\assets" (
+    if not exist "%ProgramFiles%\BrowserPicker\src\assets" mkdir "%ProgramFiles%\BrowserPicker\src\assets"
+    xcopy /E /I /Y src\assets "%ProgramFiles%\BrowserPicker\src\assets" >nul
+)
+
 :: Register as browser handler
 echo Registering browser handler...
 "%ProgramFiles%\BrowserPicker\BrowserPicker.exe"
@@ -66,4 +78,4 @@ if %errorlevel% neq 0 (
 echo.
 echo Installation completed successfully!
 echo Please set Browser Picker as your default browser in Windows Settings
-pause 
+pause

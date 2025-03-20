@@ -44,9 +44,34 @@ impl BrowserPicker {
     
     fn init_custom_fonts(ctx: &egui::Context) {
         let mut fonts = egui::FontDefinitions::default();
+        
+        // Try to load the font from various locations
+        let font_data = if let Ok(data) = std::fs::read("src/assets/fonts/segoe-ui.ttf") {
+            data
+        } else if let Ok(data) = std::fs::read("assets/fonts/segoe-ui.ttf") {
+            data
+        } else if let Ok(exe_path) = std::env::current_exe() {
+            if let Some(exe_dir) = exe_path.parent() {
+                if let Ok(data) = std::fs::read(exe_dir.join("src/assets/fonts/segoe-ui.ttf")) {
+                    data
+                } else if let Ok(data) = std::fs::read(exe_dir.join("assets/fonts/segoe-ui.ttf")) {
+                    data
+                } else {
+                    // Fallback to included font
+                    include_bytes!("assets/fonts/segoe-ui.ttf").to_vec()
+                }
+            } else {
+                // Fallback to included font
+                include_bytes!("assets/fonts/segoe-ui.ttf").to_vec()
+            }
+        } else {
+            // Fallback to included font
+            include_bytes!("assets/fonts/segoe-ui.ttf").to_vec()
+        };
+        
         fonts.font_data.insert(
             "segoe".to_owned(),
-            egui::FontData::from_static(include_bytes!("assets/fonts/segoe-ui.ttf")),
+            egui::FontData::from_owned(font_data),
         );
         
         fonts.families

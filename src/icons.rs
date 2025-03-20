@@ -1,5 +1,6 @@
 use std::path::Path;
 use eframe::egui;
+use std::env;
 
 pub fn get_browser_icon_path(browser_name: &str) -> Option<String> {
     // Normalize the browser name for matching
@@ -28,13 +29,41 @@ pub fn get_browser_icon_path(browser_name: &str) -> Option<String> {
     Some(format!("src/assets/browser_icons/{}", icon_name))
 }
 
+fn find_icon_file(base_path: &str) -> Option<String> {
+    // Try different possible locations for the assets
+    let possible_paths = vec![
+        format!("{}", base_path),
+        format!("src/assets/browser_icons/{}", Path::new(base_path).file_name().unwrap().to_str().unwrap()),
+        format!("assets/browser_icons/{}", Path::new(base_path).file_name().unwrap().to_str().unwrap()),
+    ];
+    
+    // Check if we're running from the installation directory
+    if let Ok(exe_path) = env::current_exe() {
+        if let Some(exe_dir) = exe_path.parent() {
+            let installed_path1 = exe_dir.join("src/assets/browser_icons")
+                .join(Path::new(base_path).file_name().unwrap());
+            let installed_path2 = exe_dir.join("assets/browser_icons")
+                .join(Path::new(base_path).file_name().unwrap());
+            
+            possible_paths.iter().chain([
+                installed_path1.to_string_lossy().to_string(),
+                installed_path2.to_string_lossy().to_string(),
+            ].iter()).find(|path| Path::new(path).exists()).cloned()
+        } else {
+            possible_paths.iter().find(|path| Path::new(path).exists()).cloned()
+        }
+    } else {
+        possible_paths.iter().find(|path| Path::new(path).exists()).cloned()
+    }
+}
+
 pub fn load_browser_icon(browser_name: &str, _path: &str, ctx: &egui::Context) -> Option<egui::TextureHandle> {
     // First try to load from bundled assets based on browser name
     if let Some(icon_path) = get_browser_icon_path(browser_name) {
-        // Check if the icon file exists in the assets directory
-        if Path::new(&icon_path).exists() {
+        // Try to find the icon file in various locations
+        if let Some(found_path) = find_icon_file(&icon_path) {
             // Load the icon from the file
-            if let Ok(image) = image::open(&icon_path) {
+            if let Ok(image) = image::open(&found_path) {
                 let image = image.resize(32, 32, image::imageops::FilterType::Lanczos3);
                 let size = [image.width() as _, image.height() as _];
                 let image_buffer = image.to_rgba8();
