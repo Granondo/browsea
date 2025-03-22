@@ -5,19 +5,9 @@ use eframe::egui;
 impl BrowserPicker {
     pub fn show_browser_picker_ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
         ui.vertical_centered(|ui| {
-            ui.add_space(8.0);
-            ui.heading(egui::RichText::new("Choose Browser")
-                .size(24.0)
-                .color(self.theme.foreground));
             
             ui.add_space(16.0);
             
-            // URL display
-            ui.label(egui::RichText::new(&self.url)
-                .size(14.0)
-                .color(self.theme.secondary));
-            
-            ui.add_space(16.0);
             
             // Browser buttons with icons
             ui.horizontal_wrapped(|ui| {
