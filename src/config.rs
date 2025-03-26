@@ -7,6 +7,7 @@ use std::path::PathBuf;
 #[derive(Serialize, Deserialize, Default)]
 pub struct Config {
     pub custom_browsers: Vec<(String, String)>,
+    pub hidden_browsers: Vec<String>,
 }
 
 impl Config {

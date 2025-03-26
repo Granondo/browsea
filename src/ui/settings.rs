@@ -17,6 +17,29 @@ impl BrowserPicker {
             
             ui.add_space(16.0);
             
+            // Browser visibility section
+            ui.heading(egui::RichText::new("Visible Browsers")
+                .size(16.0)
+                .color(self.theme.foreground));
+            
+            ui.add_space(8.0);
+            
+            for (name, _, _) in &self.browsers {
+                let is_visible = !self.config.hidden_browsers.contains(name);
+                let mut visible = is_visible;
+                
+                if ui.checkbox(&mut visible, name).changed() {
+                    if visible {
+                        self.config.hidden_browsers.retain(|n| n != name);
+                    } else {
+                        self.config.hidden_browsers.push(name.clone());
+                    }
+                    self.config.save().ok();
+                }
+            }
+            
+            ui.add_space(16.0);
+            
             // Add browser button
             if ui.button("➕ Add Custom Browser").clicked() {
                 if let Some(path) = FileDialog::new()

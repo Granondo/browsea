@@ -8,7 +8,11 @@ impl BrowserPicker {
             
             ui.add_space(16.0);
 
-            let browser_count = self.browsers.len();
+            let visible_browsers: Vec<_> = self.browsers.iter()
+                .filter(|(name, _, _)| !self.config.hidden_browsers.contains(name))
+                .collect();
+
+            let browser_count = visible_browsers.len();
             let browser_width = 56.0; // 48px button + 8px spacing
             let total_width = browser_width * (browser_count as f32);
             
@@ -25,7 +29,7 @@ impl BrowserPicker {
                             ui.add_space(padding);
                         }
                         
-                        for (i, (name, path, icon)) in self.browsers.iter().enumerate() {
+                        for (i, (name, path, icon)) in visible_browsers.iter().enumerate() {
                             let browser_index = i;
                             ui.vertical(|ui| {
                                 let mut response = if let Some(icon) = icon {
