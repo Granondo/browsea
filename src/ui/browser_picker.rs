@@ -5,7 +5,6 @@ use eframe::egui;
 impl BrowserPicker {
     pub fn show_browser_picker_ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
         ui.vertical_centered(|ui| {
-            
             ui.add_space(16.0);
 
             let visible_browsers: Vec<_> = self.browsers.iter()
@@ -13,16 +12,14 @@ impl BrowserPicker {
                 .collect();
 
             let browser_count = visible_browsers.len();
-            let browser_width = 56.0; // 48px button + 8px spacing
+            let browser_width = 56.0;
             let total_width = browser_width * (browser_count as f32);
             
-            // Browser buttons with icons
             ui.allocate_ui_with_layout(
                 egui::vec2(ui.available_width(), ui.available_height()),
                 egui::Layout::top_down(egui::Align::Center),
                 |ui| {
                     ui.horizontal_wrapped(|ui| {
-                        // Add initial space to center the icons
                         let available_width = ui.available_width();
                         let padding = (available_width - total_width) / 2.0;
                         if padding > 0.0 {
@@ -32,12 +29,22 @@ impl BrowserPicker {
                         for (i, (name, path, icon)) in visible_browsers.iter().enumerate() {
                             let browser_index = i;
                             ui.vertical(|ui| {
-                                let mut response = if let Some(icon) = icon {
-                                    ui.add_sized(
-                                        egui::vec2(48.0, 48.0),
-                                        egui::ImageButton::new(icon, egui::vec2(32.0, 32.0))
-                                            .frame(true)
-                                    )
+                                let button_response = if let Some(icon) = icon {
+                                    let frame = egui::Frame::none()
+                                        .rounding(12.0)
+                                        .fill(if ui.rect_contains_pointer(ui.min_rect()) {
+                                            self.theme.button_hover
+                                        } else {
+                                            self.theme.button_bg
+                                        });
+
+                                    frame.show(ui, |ui| {
+                                        ui.add_sized(
+                                            egui::vec2(48.0, 48.0),
+                                            egui::ImageButton::new(icon, egui::vec2(32.0, 32.0))
+                                                .frame(false)
+                                        )
+                                    }).inner
                                 } else {
                                     ui.add(egui::Button::new(
                                         egui::RichText::new(name)
@@ -45,28 +52,19 @@ impl BrowserPicker {
                                             .color(self.theme.foreground)
                                     )
                                     .min_size(egui::vec2(48.0, 48.0))
-                                    .rounding(8.0)
-                                    .fill(self.theme.background))
+                                    .rounding(12.0)
+                                    .fill(if ui.rect_contains_pointer(ui.min_rect()) {
+                                        self.theme.button_hover
+                                    } else {
+                                        self.theme.button_bg
+                                    }))
                                 };
                                 
                                 ui.label(egui::RichText::new(name)
                                     .size(12.0)
                                     .color(self.theme.foreground));
                                 
-                                if response.hovered() {
-                                    response.mark_changed();
-                                    ui.painter().rect_filled(
-                                        response.rect,
-                                        8.0,
-                                        if self.dark_mode {
-                                            egui::Color32::from_white_alpha(10)
-                                        } else {
-                                            egui::Color32::from_black_alpha(10)
-                                        },
-                                    );
-                                }
-                                
-                                if response.clicked() {
+                                if button_response.clicked() {
                                     if let Some((_, browser_path, _)) = self.browsers.get(browser_index) {
                                         if let Err(e) = browser_launcher::launch_browser(browser_path, &self.url) {
                                             eprintln!("{}", e);
@@ -84,14 +82,34 @@ impl BrowserPicker {
             
             ui.add_space(16.0);
             
-            // Settings button
-            if ui.button(
+            // Settings button with updated styling
+            let settings_button = ui.add(egui::Button::new(
                 egui::RichText::new("⚙ Settings")
                     .size(14.0)
-                    .color(self.theme.secondary)
-            ).clicked() {
+                    .color(self.theme.foreground)
+            )
+            .fill(if ui.rect_contains_pointer(ui.min_rect()) {
+                self.theme.button_hover
+            } else {
+                self.theme.button_bg
+            })
+            .rounding(8.0));
+            
+            if settings_button.clicked() {
                 self.show_settings = true;
             }
         });
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
