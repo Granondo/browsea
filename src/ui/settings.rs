@@ -38,7 +38,7 @@ impl BrowserPicker {
                         ui.add_space(8.0);
                     }
 
-                    if ui.checkbox(&mut visible, name).changed() {
+                    if ui.checkbox(&mut visible,"").changed() {
                         if visible {
                             self.config.hidden_browsers.retain(|n| n != name);
                         } else {

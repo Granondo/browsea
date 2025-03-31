@@ -25,7 +25,7 @@ impl Theme {
 
     pub fn dark() -> Self {
         Self {
-            background: egui::Color32::from_rgb(32, 32, 32),
+            background: egui::Color32::from_rgb(17, 24, 39),
             foreground: egui::Color32::from_rgb(245, 245, 245),
             primary: egui::Color32::from_rgb(59, 130, 246),
             secondary: egui::Color32::from_rgb(156, 163, 175),
