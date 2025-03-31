@@ -24,18 +24,29 @@ impl BrowserPicker {
             
             ui.add_space(8.0);
             
-            for (name, _, _) in &self.browsers {
+            for (name, _, icon) in &self.browsers {
                 let is_visible = !self.config.hidden_browsers.contains(name);
                 let mut visible = is_visible;
-                
-                if ui.checkbox(&mut visible, name).changed() {
-                    if visible {
-                        self.config.hidden_browsers.retain(|n| n != name);
-                    } else {
-                        self.config.hidden_browsers.push(name.clone());
+
+                ui.horizontal(|ui| {
+                    // Show browser icon
+                    if let Some(icon) = icon {
+                        ui.add_sized(
+                            egui::vec2(24.0, 24.0),
+                            egui::Image::new(icon, egui::vec2(16.0, 16.0))
+                        );
+                        ui.add_space(8.0);
                     }
-                    self.config.save().ok();
-                }
+
+                    if ui.checkbox(&mut visible, name).changed() {
+                        if visible {
+                            self.config.hidden_browsers.retain(|n| n != name);
+                        } else {
+                            self.config.hidden_browsers.push(name.clone());
+                        }
+                        self.config.save().ok();
+                    }
+                });
             }
             
             ui.add_space(16.0);
@@ -57,7 +68,6 @@ impl BrowserPicker {
                 }
             }
         
-            
             ui.add_space(10.0);
             
             // Save and back buttons
@@ -73,3 +83,4 @@ impl BrowserPicker {
         });
     }
 }
+
