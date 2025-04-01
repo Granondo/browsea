@@ -86,6 +86,7 @@ impl BrowserPicker {
 impl eframe::App for BrowserPicker {
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
         let theme = if self.dark_mode { Theme::dark() } else { Theme::light() };
+        self.theme = theme.clone(); // Make sure to update the instance theme
         
         let mut style = (*ctx.style()).clone();
         style.visuals = egui::Visuals {
@@ -104,6 +105,7 @@ impl eframe::App for BrowserPicker {
             window_stroke: egui::Stroke::NONE,
             widgets: egui::style::Widgets::default(),
             selection: egui::style::Selection::default(),
+            override_text_color: Some(theme.foreground),
             ..Default::default()
         };
         
@@ -118,3 +120,6 @@ impl eframe::App for BrowserPicker {
         });
     }
 }
+
+
+
