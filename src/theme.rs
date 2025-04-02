@@ -16,7 +16,7 @@ impl Theme {
         Self {
             background: egui::Color32::from_rgb(106, 142, 219), // #6a8edb
             foreground: egui::Color32::from_rgb(32, 32, 32),
-            primary: egui::Color32::from_rgb(59, 130, 246),
+            primary: egui::Color32::from_rgb(255, 255, 255),
             secondary: egui::Color32::from_rgb(107, 114, 128),
             accent: egui::Color32::from_rgb(99, 102, 241),
             button_bg: egui::Color32::from_rgb(255, 255, 255),
