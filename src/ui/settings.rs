@@ -1,47 +1,55 @@
 use crate::app::BrowserPicker;
 use eframe::egui;
 use rfd::FileDialog;
+use image::GenericImageView;
 
 impl BrowserPicker {
     pub fn show_settings_ui(&mut self, ui: &mut egui::Ui) {
         ui.vertical_centered(|ui| {
             ui.add_space(8.0);
-            
+
             // Header row with Settings title and theme toggle
             ui.horizontal(|ui| {
                 ui.add_space(16.0);
                 ui.heading(egui::RichText::new("Settings")
                     .size(24.0)
                     .color(self.theme.primary));
-                
+
                 // Push the theme toggle to the right
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                     let icon_size = egui::vec2(20.0, 20.0);
                     let (rect, response) = ui.allocate_exact_size(icon_size, egui::Sense::click());
-                    
+
                     if ui.is_rect_visible(rect) {
-                        if self.dark_mode {
-                            // Draw sun
-                            ui.painter().circle(
-                                rect.center(),
-                                8.0,
-                                self.theme.foreground,
-                                egui::Stroke::NONE,
-                            );
+                        // Draw circular background
+                        let circle_color = if ui.rect_contains_pointer(rect) {
+                            self.theme.button_hover
                         } else {
-                            // Draw moon
-                            ui.painter().circle(
-                                rect.center(),
-                                8.0,
-                                self.theme.foreground,
-                                egui::Stroke::new(1.5, self.theme.foreground),
-                            );
-                            ui.painter().circle(
-                                rect.center() + egui::vec2(3.0, 0.0),
-                                8.0,
-                                self.theme.background,
-                                egui::Stroke::NONE,
-                            );
+                            self.theme.button_bg
+                        };
+                        
+                        ui.painter().circle(
+                            rect.center(),
+                            rect.width() / 1.2,
+                            circle_color,
+                            egui::Stroke::new(1.0, self.theme.primary)
+                        );
+
+                        // Draw the icon centered in the clickable rect
+                        if self.dark_mode {
+                            if let Some(icon) = &self.sun_icon {
+                                ui.put(
+                                    rect,
+                                    egui::Image::new(icon, egui::vec2(20.0, 20.0))
+                                );
+                            }
+                        } else {
+                            if let Some(icon) = &self.moon_icon {
+                                ui.put(
+                                    rect,
+                                    egui::Image::new(icon, egui::vec2(20.0, 20.0))
+                                );
+                            }
                         }
                     }
 
@@ -51,14 +59,14 @@ impl BrowserPicker {
                     ui.add_space(16.0);
                 });
             });
-            
+
             ui.add_space(16.0);
-            
+
             // Browser visibility section
             ui.heading(egui::RichText::new("Visible Browsers")
                 .size(16.0)
                 .color(self.theme.primary));
-            
+
             ui.add_space(8.0);
 
             let browser_count = &self.browsers.len();
@@ -75,7 +83,7 @@ impl BrowserPicker {
                         if padding > 0.0 {
                             ui.add_space(padding);
                         }
-                        
+
                         for (name, _, icon) in &self.browsers {
                             let is_visible = !self.config.hidden_browsers.contains(name);
                             let mut visible = is_visible;
@@ -94,20 +102,20 @@ impl BrowserPicker {
                                     // Custom styled checkbox
                                     let checkbox_size = egui::vec2(18.0, 18.0);
                                     let (rect, response) = ui.allocate_exact_size(checkbox_size, egui::Sense::click());
-                                    
+
                                     if response.clicked() {
                                         visible = !visible;
                                     }
 
                                     // Draw custom checkbox
                                     if ui.is_rect_visible(rect) {
-                                        let visuals = ui.style().interact(&response);
+                                        let _visuals = ui.style().interact(&response);
                                         let stroke = egui::Stroke::new(1.0, self.theme.primary);
                                         let rounding = 4.0;
 
                                         ui.painter().rect(
-                                            rect, 
-                                            rounding, 
+                                            rect,
+                                            rounding,
                                             if visible { self.theme.primary } else { self.theme.button_bg },
                                             stroke,
                                         );
@@ -121,11 +129,11 @@ impl BrowserPicker {
                                                 rect.min + egui::vec2(14.0, 5.0),
                                             ];
                                             ui.painter().line_segment(
-                                                [points[0], points[1]], 
+                                                [points[0], points[1]],
                                                 egui::Stroke::new(2.0, check_color)
                                             );
                                             ui.painter().line_segment(
-                                                [points[1], points[2]], 
+                                                [points[1], points[2]],
                                                 egui::Stroke::new(2.0, check_color)
                                             );
                                         }
@@ -145,9 +153,9 @@ impl BrowserPicker {
                     });
                 },
             );
-            
+
             ui.add_space(16.0);
-            
+
             // Add browser button with consistent styling
             if ui.add(egui::Button::new(
                 egui::RichText::new("➕ Add Custom Browser")
@@ -163,7 +171,7 @@ impl BrowserPicker {
                 if let Some(path) = FileDialog::new()
                     .add_filter("Executable", &["exe"])
                     .set_title("Select Browser Executable")
-                    .pick_file() 
+                    .pick_file()
                 {
                     if let Some(file_name) = path.file_stem() {
                         let browser_name = file_name.to_string_lossy().to_string();
@@ -174,9 +182,9 @@ impl BrowserPicker {
                     }
                 }
             }
-        
+
             ui.add_space(10.0);
-            
+
             // Save and back buttons with consistent styling
             ui.horizontal(|ui| {
                 if ui.add(egui::Button::new(
@@ -192,7 +200,7 @@ impl BrowserPicker {
                 .rounding(8.0)).clicked() {
                     self.config.save().ok();
                 }
-                
+
                 if ui.add(egui::Button::new(
                     egui::RichText::new("Back")
                         .size(14.0)
@@ -210,6 +218,10 @@ impl BrowserPicker {
         });
     }
 }
+
+
+
+
 
 
 

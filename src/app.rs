@@ -11,6 +11,8 @@ pub struct BrowserPicker {
     pub show_settings: bool,
     pub theme: Theme,
     pub dark_mode: bool,
+    pub sun_icon: Option<egui::TextureHandle>,
+    pub moon_icon: Option<egui::TextureHandle>,
 }
 
 impl BrowserPicker {
@@ -25,6 +27,8 @@ impl BrowserPicker {
             show_settings: false,
             theme: Theme::light(),
             dark_mode: false,
+            sun_icon: icons::load_theme_icon("sun", &cc.egui_ctx),
+            moon_icon: icons::load_theme_icon("moon", &cc.egui_ctx),
         };
         
         // Get browsers without icons first
@@ -120,6 +124,8 @@ impl eframe::App for BrowserPicker {
         });
     }
 }
+
+
 
 
 

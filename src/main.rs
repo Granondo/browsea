@@ -15,7 +15,7 @@ use std::path::PathBuf;
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
-    
+
     if args.len() > 1 {
         // Show browser picker for URL
         let url = args[1].clone();
@@ -28,7 +28,7 @@ fn main() {
             icon_data: load_icon(),
             ..Default::default()
         };
-        
+
         // Handle the Result returned by run_native
         if let Err(e) = eframe::run_native(
             "Browser Picker",
@@ -53,7 +53,7 @@ fn load_icon() -> Option<eframe::IconData> {
         PathBuf::from("src/assets/app_icon/app_icon.png"),
         PathBuf::from("assets/app_icon/app_icon.png"),
     ];
-    
+
     // Add paths relative to the executable location
     let mut exe_paths = Vec::new();
     if let Ok(exe_path) = std::env::current_exe() {
@@ -62,7 +62,7 @@ fn load_icon() -> Option<eframe::IconData> {
             exe_paths.push(exe_dir.join("assets/app_icon/app_icon.png"));
         }
     }
-    
+
     // Try to find and load the icon from any of the possible locations
     for path in possible_paths.iter().chain(exe_paths.iter()) {
         if let Ok(image) = image::open(path) {
@@ -70,7 +70,7 @@ fn load_icon() -> Option<eframe::IconData> {
             let image = image.to_rgba8();
             let (width, height) = image.dimensions();
             let rgba = image.into_raw();
-            
+
             return Some(eframe::IconData {
                 rgba,
                 width,
@@ -78,7 +78,7 @@ fn load_icon() -> Option<eframe::IconData> {
             });
         }
     }
-    
+
     eprintln!("Failed to load application icon from any location");
     None
 }

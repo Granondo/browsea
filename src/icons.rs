@@ -117,3 +117,26 @@ fn create_fallback_icon(browser_name: &str, ctx: &egui::Context) -> Option<egui:
     
     Some(texture)
 }
+
+pub fn load_theme_icon(icon_name: &str, ctx: &egui::Context) -> Option<egui::TextureHandle> {
+    let icon_path = format!("src/assets/theme_icons/{}.png", icon_name);
+    
+    // Try to find the icon file in various locations
+    if let Some(found_path) = find_icon_file(&icon_path) {
+        // Load the icon from the file
+        if let Ok(image) = image::open(&found_path) {
+            let image = image.resize(20, 20, image::imageops::FilterType::Lanczos3);
+            let size = [image.width() as _, image.height() as _];
+            let image_buffer = image.to_rgba8();
+            let pixels = image_buffer.as_raw().to_vec();
+            
+            return Some(ctx.load_texture(
+                format!("theme_icon_{}", icon_name),
+                egui::ColorImage::from_rgba_unmultiplied(size, &pixels),
+                egui::TextureOptions::default(),
+            ));
+        }
+    }
+    None
+}
+
