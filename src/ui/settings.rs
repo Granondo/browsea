@@ -23,7 +23,7 @@ impl BrowserPicker {
                     if ui.is_rect_visible(rect) {
                         // Draw circular background
                         let circle_color = if ui.rect_contains_pointer(rect) {
-                            self.theme.button_hover
+                            self.theme.button_bg
                         } else {
                             self.theme.button_bg
                         };
@@ -32,7 +32,7 @@ impl BrowserPicker {
                             rect.center(),
                             rect.width() / 1.2,
                             circle_color,
-                            egui::Stroke::new(1.0, self.theme.primary)
+                            egui::Stroke::new(1.0, self.theme.button_bg)
                         );
 
                         // Draw the icon centered in the clickable rect
