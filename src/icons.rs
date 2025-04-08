@@ -40,9 +40,7 @@ fn find_icon_file(base_path: &str) -> Option<String> {
 
     // Try different possible locations for the assets
     let possible_paths = vec![
-        format!("{}", base_path),
         format!("src/assets/{}/{}", dir_part, file_name),
-        format!("assets/{}/{}", dir_part, file_name),
     ];
 
     // Check if we're running from the installation directory
@@ -50,12 +48,9 @@ fn find_icon_file(base_path: &str) -> Option<String> {
         if let Some(exe_dir) = exe_path.parent() {
             let installed_path1 = exe_dir.join(format!("src/assets/{}", dir_part))
                 .join(file_name);
-            let installed_path2 = exe_dir.join(format!("assets/{}", dir_part))
-                .join(file_name);
 
             possible_paths.iter().chain([
                 installed_path1.to_string_lossy().to_string(),
-                installed_path2.to_string_lossy().to_string(),
             ].iter()).find(|path| Path::new(path).exists()).cloned()
         } else {
             possible_paths.iter().find(|path| Path::new(path).exists()).cloned()
