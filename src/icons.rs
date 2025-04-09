@@ -30,63 +30,47 @@ pub fn get_browser_icon_path(browser_name: &str) -> Option<String> {
 }
 
 fn find_icon_file(base_path: &str) -> Option<String> {
-    // Extract the file name and directory from the base path
-    let file_name = Path::new(base_path).file_name().unwrap().to_str().unwrap();
-    let dir_part = if base_path.contains("theme_icons") {
-        "theme_icons"
-    } else {
-        "browser_icons"
-    };
-
-    // Try different possible locations for the assets
+    // Try multiple possible locations for the icon
     let possible_paths = vec![
-        format!("src/assets/{}/{}", dir_part, file_name),
+        base_path.to_string(),
+        if let Ok(exe_path) = env::current_exe() {
+            if let Some(exe_dir) = exe_path.parent() {
+                exe_dir.join(base_path).to_string_lossy().to_string()
+            } else {
+                base_path.to_string()
+            }
+        } else {
+            base_path.to_string()
+        },
     ];
 
-    // Check if we're running from the installation directory
-    if let Ok(exe_path) = env::current_exe() {
-        if let Some(exe_dir) = exe_path.parent() {
-            let installed_path1 = exe_dir.join(format!("src/assets/{}", dir_part))
-                .join(file_name);
-
-            possible_paths.iter().chain([
-                installed_path1.to_string_lossy().to_string(),
-            ].iter()).find(|path| Path::new(path).exists()).cloned()
-        } else {
-            possible_paths.iter().find(|path| Path::new(path).exists()).cloned()
+    // Try each path and return the first one that exists
+    for path in possible_paths {
+        if Path::new(&path).exists() {
+            return Some(path);
         }
-    } else {
-        possible_paths.iter().find(|path| Path::new(path).exists()).cloned()
     }
+
+    None
 }
 
 pub fn load_browser_icon(browser_name: &str, _path: &str, ctx: &egui::Context) -> Option<egui::TextureHandle> {
     // First try to load from bundled assets based on browser name
     if let Some(icon_path) = get_browser_icon_path(browser_name) {
-        // Debug browser icon paths
-
-        // Try to find the icon file in various locations
         if let Some(found_path) = find_icon_file(&icon_path) {
             println!("Found browser icon at: {}", found_path);
-            // Load the icon from the file
-            if let Ok(image) = image::open(&found_path) {
-                let image = image.resize(32, 32, image::imageops::FilterType::Lanczos3);
-                let size = [image.width() as _, image.height() as _];
-                let image_buffer = image.to_rgba8();
-                let pixels = image_buffer.as_raw().to_vec(); // Create owned vector from the slice
-
+            
+            if let Some(image) = load_and_process_image(&found_path) {
                 return Some(ctx.load_texture(
                     format!("browser_icon_{}", browser_name),
-                    egui::ColorImage::from_rgba_unmultiplied(size, &pixels),
+                    image,
                     egui::TextureOptions::default(),
                 ));
-            } else {
-                println!("Failed to open browser image at: {}", found_path);
             }
         } else {
             println!("Could not find browser icon: {}", browser_name);
         }
-    }
+    }    
 
     // If no matching icon or loading failed, create a fallback colored icon
     create_fallback_icon(browser_name, ctx)
@@ -133,21 +117,14 @@ pub fn load_theme_icon(icon_name: &str, ctx: &egui::Context) -> Option<egui::Tex
     // Try to find the icon file in various locations
     if let Some(found_path) = find_icon_file(&icon_path) {
         println!("Found theme icon at: {}", found_path);
-        // Load the icon from the file
-        if let Ok(image) = image::open(&found_path) {
-            let image = image.resize(20, 20, image::imageops::FilterType::Lanczos3);
-            let size = [image.width() as _, image.height() as _];
-            let image_buffer = image.to_rgba8();
-            let pixels = image_buffer.as_raw().to_vec();
 
-            return Some(ctx.load_texture(
-                format!("theme_icon_{}", icon_name),
-                egui::ColorImage::from_rgba_unmultiplied(size, &pixels),
-                egui::TextureOptions::default(),
-            ));
-        } else {
-            println!("Failed to open image at: {}", found_path);
-        }
+            if let Some(image) = load_and_process_image(&found_path) {
+                return Some(ctx.load_texture(
+                    format!("theme_icon_{}", icon_name),
+                    image,
+                    egui::TextureOptions::default(),
+                ));
+            }
     } else {
         println!("Could not find theme icon: {}", icon_name);
     }
@@ -155,4 +132,21 @@ pub fn load_theme_icon(icon_name: &str, ctx: &egui::Context) -> Option<egui::Tex
     // Create a fallback icon if the theme icon couldn't be loaded
     create_fallback_icon(icon_name, ctx)
 }
+
+fn load_and_process_image(path: &str) -> Option<egui::ColorImage> {
+    match image::open(path) {
+        Ok(image) => {
+            let image = image.resize(32, 32, image::imageops::FilterType::Lanczos3);
+            let size = [image.width() as _, image.height() as _];
+            let image_buffer = image.to_rgba8();
+            let pixels = image_buffer.as_raw().to_vec();
+            Some(egui::ColorImage::from_rgba_unmultiplied(size, &pixels))
+        },
+        Err(_) => {
+            println!("Failed to open image at: {}", path);
+            None
+        }
+    }
+}
+
 
