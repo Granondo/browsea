@@ -136,7 +136,8 @@ pub fn load_theme_icon(icon_name: &str, ctx: &egui::Context) -> Option<egui::Tex
 fn load_and_process_image(path: &str) -> Option<egui::ColorImage> {
     match image::open(path) {
         Ok(image) => {
-            let image = image.resize(32, 32, image::imageops::FilterType::Lanczos3);
+            // Increase size from 32 to 64 for better quality when scaling
+            let image = image.resize(512, 512, image::imageops::FilterType::Lanczos3);
             let size = [image.width() as _, image.height() as _];
             let image_buffer = image.to_rgba8();
             let pixels = image_buffer.as_raw().to_vec();
@@ -148,5 +149,6 @@ fn load_and_process_image(path: &str) -> Option<egui::ColorImage> {
         }
     }
 }
+
 
 

@@ -1,7 +1,6 @@
 use crate::app::BrowserPicker;
 use eframe::egui;
 use rfd::FileDialog;
-use image::GenericImageView;
 
 impl BrowserPicker {
     pub fn show_settings_ui(&mut self, ui: &mut egui::Ui) {
@@ -63,7 +62,7 @@ impl BrowserPicker {
             ui.add_space(16.0);
 
             // Browser visibility section
-            ui.heading(egui::RichText::new("Visible Browsers")
+            ui.heading(egui::RichText::new("Browsers")
                 .size(16.0)
                 .color(self.theme.primary));
 
