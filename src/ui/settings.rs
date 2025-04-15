@@ -5,49 +5,36 @@ use rfd::FileDialog;
 impl BrowserPicker {
     pub fn show_settings_ui(&mut self, ui: &mut egui::Ui) {
         ui.vertical_centered(|ui| {
-            ui.add_space(8.0);
-
-            // Header row with Settings title and theme toggle
+            // Header row with theme toggle
             ui.horizontal(|ui| {
-                ui.add_space(16.0);
-                ui.heading(egui::RichText::new("Settings")
-                    .size(24.0)
-                    .color(self.theme.primary));
-
                 // Push the theme toggle to the right
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                    let icon_size = egui::vec2(20.0, 20.0);
+                    let icon_size = egui::vec2(24.0, 24.0);
                     let (rect, response) = ui.allocate_exact_size(icon_size, egui::Sense::click());
 
                     if ui.is_rect_visible(rect) {
                         // Draw circular background
                         let circle_color = if ui.rect_contains_pointer(rect) {
-                            self.theme.button_bg
+                            self.theme.button_hover
                         } else {
                             self.theme.button_bg
                         };
                         
                         ui.painter().circle(
                             rect.center(),
-                            rect.width() / 1.2,
+                            rect.width() / 2.0,
                             circle_color,
                             egui::Stroke::new(1.0, self.theme.button_bg)
                         );
 
-                        // Draw the icon centered in the clickable rect
+                        // Draw the icon
                         if self.dark_mode {
                             if let Some(icon) = &self.sun_icon {
-                                ui.put(
-                                    rect,
-                                    egui::Image::new(icon, egui::vec2(20.0, 20.0))
-                                );
+                                ui.put(rect, egui::Image::new(icon, icon_size));
                             }
                         } else {
                             if let Some(icon) = &self.moon_icon {
-                                ui.put(
-                                    rect,
-                                    egui::Image::new(icon, egui::vec2(20.0, 20.0))
-                                );
+                                ui.put(rect, egui::Image::new(icon, icon_size));
                             }
                         }
                     }
@@ -59,17 +46,17 @@ impl BrowserPicker {
                 });
             });
 
-            ui.add_space(16.0);
+            ui.add_space(24.0);
 
             // Browser visibility section
             ui.heading(egui::RichText::new("Browsers")
                 .size(16.0)
                 .color(self.theme.primary));
 
-            ui.add_space(8.0);
+            ui.add_space(16.0);
 
             let browser_count = &self.browsers.len();
-            let browser_width = 56.0;
+            let browser_width = 72.0; // Increased for better spacing
             let total_width = browser_width * (*browser_count as f32);
 
             ui.allocate_ui_with_layout(
@@ -89,17 +76,20 @@ impl BrowserPicker {
 
                             ui.horizontal_centered(|ui| {
                                 ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
+                                    ui.add_space(8.0); // Consistent left padding
+
                                     // Show browser icon
                                     if let Some(icon) = icon {
                                         ui.add_sized(
-                                            egui::vec2(24.0, 24.0),
-                                            egui::Image::new(icon, egui::vec2(20.0, 20.0))
+                                            egui::vec2(32.0, 32.0),
+                                            egui::Image::new(icon, egui::vec2(24.0, 24.0))
                                         );
-                                        ui.add_space(8.0);
                                     }
+                                    
+                                    ui.add_space(12.0); // Consistent spacing between icon and checkbox
 
                                     // Custom styled checkbox
-                                    let checkbox_size = egui::vec2(18.0, 18.0);
+                                    let checkbox_size = egui::vec2(20.0, 20.0);
                                     let (rect, response) = ui.allocate_exact_size(checkbox_size, egui::Sense::click());
 
                                     if response.clicked() {
@@ -108,7 +98,6 @@ impl BrowserPicker {
 
                                     // Draw custom checkbox
                                     if ui.is_rect_visible(rect) {
-                                        let _visuals = ui.style().interact(&response);
                                         let stroke = egui::Stroke::new(1.0, self.theme.primary);
                                         let rounding = 4.0;
 
@@ -123,9 +112,9 @@ impl BrowserPicker {
                                             // Draw checkmark
                                             let check_color = self.theme.background;
                                             let points = [
-                                                rect.min + egui::vec2(4.0, 9.0),
-                                                rect.min + egui::vec2(8.0, 13.0),
-                                                rect.min + egui::vec2(14.0, 5.0),
+                                                rect.min + egui::vec2(5.0, 10.0),
+                                                rect.min + egui::vec2(9.0, 14.0),
+                                                rect.min + egui::vec2(15.0, 6.0),
                                             ];
                                             ui.painter().line_segment(
                                                 [points[0], points[1]],
@@ -137,6 +126,8 @@ impl BrowserPicker {
                                             );
                                         }
                                     }
+
+                                    ui.add_space(8.0); // Consistent right padding
                                 });
 
                                 if visible != is_visible {
@@ -153,7 +144,7 @@ impl BrowserPicker {
                 },
             );
 
-            ui.add_space(16.0);
+            ui.add_space(24.0);
 
             // Add browser button with consistent styling
             if ui.add(egui::Button::new(
@@ -166,6 +157,7 @@ impl BrowserPicker {
             } else {
                 self.theme.button_bg
             })
+            .min_size(egui::vec2(200.0, 36.0)) // Consistent button size
             .rounding(8.0)).clicked() {
                 if let Some(path) = FileDialog::new()
                     .add_filter("Executable", &["exe"])
@@ -182,41 +174,35 @@ impl BrowserPicker {
                 }
             }
 
-            ui.add_space(10.0);
+            ui.add_space(16.0);
 
             // Save and back buttons with consistent styling
             ui.horizontal(|ui| {
-                if ui.add(egui::Button::new(
-                    egui::RichText::new("Save")
-                        .size(14.0)
-                        .color(self.theme.foreground)
-                )
-                .fill(if ui.rect_contains_pointer(ui.min_rect()) {
-                    self.theme.button_hover
-                } else {
-                    self.theme.button_bg
-                })
-                .rounding(8.0)).clicked() {
-                    self.config.save().ok();
-                }
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    if ui.add(egui::Button::new(
+                        egui::RichText::new("Back")
+                            .size(14.0)
+                            .color(self.theme.foreground)
+                    )
+                    .fill(if ui.rect_contains_pointer(ui.min_rect()) {
+                        self.theme.button_hover
+                    } else {
+                        self.theme.button_bg
+                    })
+                    .min_size(egui::vec2(100.0, 36.0))
+                    .rounding(8.0)).clicked() {
+                        self.show_settings = false;
+                    }
 
-                if ui.add(egui::Button::new(
-                    egui::RichText::new("Back")
-                        .size(14.0)
-                        .color(self.theme.foreground)
-                )
-                .fill(if ui.rect_contains_pointer(ui.min_rect()) {
-                    self.theme.button_hover
-                } else {
-                    self.theme.button_bg
-                })
-                .rounding(8.0)).clicked() {
-                    self.show_settings = false;
-                }
+                    ui.add_space(16.0);
+                });
             });
         });
     }
 }
+
+
+
 
 
 
