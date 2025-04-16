@@ -5,8 +5,44 @@ use rfd::FileDialog;
 impl BrowserPicker {
     pub fn show_settings_ui(&mut self, ui: &mut egui::Ui) {
         ui.vertical_centered(|ui| {
-            // Header row with theme toggle
+            // Header row with back button and theme toggle
             ui.horizontal(|ui| {
+                // Back button on the left
+                ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
+                    let icon_size = egui::vec2(24.0, 24.0);
+                    let circle_size = egui::vec2(32.0, 32.0);
+                    let (rect, response) = ui.allocate_exact_size(circle_size, egui::Sense::click());
+
+                    if ui.is_rect_visible(rect) {
+                        // Draw circular background
+                        let circle_color = if ui.rect_contains_pointer(rect) {
+                            self.theme.button_hover
+                        } else {
+                            self.theme.button_bg
+                        };
+                        
+                        ui.painter().circle(
+                            rect.center(),
+                            rect.width() / 2.0,
+                            circle_color,
+                            egui::Stroke::new(1.0, self.theme.button_bg)
+                        );
+
+                        // Draw back arrow
+                        ui.painter().text(
+                            rect.center(),
+                            egui::Align2::CENTER_CENTER,
+                            "⬅"  ,  // Simple arrow, will be flipped with scale
+                            egui::FontId::proportional(20.0),
+                            self.theme.foreground
+                        );
+                    }
+
+                    if response.clicked() {
+                        self.show_settings = false;
+                    }
+                });
+
                 // Push the theme toggle to the right
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                     let icon_size = egui::vec2(20.0, 20.0);  // Keep icon size at 24.0
@@ -53,9 +89,15 @@ impl BrowserPicker {
             ui.add_space(24.0);
 
             // Browser visibility section
-            ui.heading(egui::RichText::new("Browsers")
-                .size(36.0)
-                .color(self.theme.primary));
+            ui.heading(
+                egui::RichText::new("BROWSERS")  // Using uppercase for more emphasis
+                    .size(36.0)
+                    // .family(egui::FontFamily::Monospace)  // Using monospace font
+                    // .strong()
+                    // .raised()
+                    .color(self.theme.primary)
+            );
+
 
             ui.add_space(16.0);
 
@@ -179,31 +221,21 @@ impl BrowserPicker {
             }
 
             ui.add_space(16.0);
-
-            // Save and back buttons with consistent styling
-            ui.horizontal(|ui| {
-                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                    if ui.add(egui::Button::new(
-                        egui::RichText::new("Back")
-                            .size(14.0)
-                            .color(self.theme.foreground)
-                    )
-                    .fill(if ui.rect_contains_pointer(ui.min_rect()) {
-                        self.theme.button_hover
-                    } else {
-                        self.theme.button_bg
-                    })
-                    .min_size(egui::vec2(100.0, 36.0))
-                    .rounding(8.0)).clicked() {
-                        self.show_settings = false;
-                    }
-
-                    ui.add_space(16.0);
-                });
-            });
         });
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
