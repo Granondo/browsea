@@ -9,8 +9,9 @@ impl BrowserPicker {
             ui.horizontal(|ui| {
                 // Push the theme toggle to the right
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                    let icon_size = egui::vec2(24.0, 24.0);
-                    let (rect, response) = ui.allocate_exact_size(icon_size, egui::Sense::click());
+                    let icon_size = egui::vec2(20.0, 20.0);  // Keep icon size at 24.0
+                    let circle_size = egui::vec2(32.0, 32.0); // New variable for circle size
+                    let (rect, response) = ui.allocate_exact_size(circle_size, egui::Sense::click());  // Use circle_size here
 
                     if ui.is_rect_visible(rect) {
                         // Draw circular background
@@ -22,19 +23,22 @@ impl BrowserPicker {
                         
                         ui.painter().circle(
                             rect.center(),
-                            rect.width() / 2.0,
+                            rect.width() / 2.0,  // This will now use the circle_size width
                             circle_color,
                             egui::Stroke::new(1.0, self.theme.button_bg)
                         );
 
+                        // Calculate centered position for the icon within the larger circle
+                        let icon_rect = egui::Rect::from_center_size(rect.center(), icon_size);
+
                         // Draw the icon
                         if self.dark_mode {
                             if let Some(icon) = &self.sun_icon {
-                                ui.put(rect, egui::Image::new(icon, icon_size));
+                                ui.put(icon_rect, egui::Image::new(icon, icon_size));
                             }
                         } else {
                             if let Some(icon) = &self.moon_icon {
-                                ui.put(rect, egui::Image::new(icon, icon_size));
+                                ui.put(icon_rect, egui::Image::new(icon, icon_size));
                             }
                         }
                     }
@@ -50,7 +54,7 @@ impl BrowserPicker {
 
             // Browser visibility section
             ui.heading(egui::RichText::new("Browsers")
-                .size(16.0)
+                .size(36.0)
                 .color(self.theme.primary));
 
             ui.add_space(16.0);
@@ -200,6 +204,8 @@ impl BrowserPicker {
         });
     }
 }
+
+
 
 
 

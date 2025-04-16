@@ -7,38 +7,41 @@ impl BrowserPicker {
         ui.vertical_centered(|ui| {
             // Add settings button at the top right
             ui.horizontal(|ui| {
-                ui.add_space(ui.available_width() - 48.0); // Push to right
-                let icon_size = egui::vec2(32.0, 32.0);
-                let (rect, response) = ui.allocate_exact_size(icon_size, egui::Sense::click());
+                // Push the settings icon to the right
+                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                    let circle_size = egui::vec2(32.0, 32.0);
+                    let (rect, response) = ui.allocate_exact_size(circle_size, egui::Sense::click());
 
-                if ui.is_rect_visible(rect) {
-                    // Draw circular background
-                    let circle_color = if ui.rect_contains_pointer(rect) {
-                        self.theme.button_hover
-                    } else {
-                        self.theme.button_bg
-                    };
-                    
-                    ui.painter().circle(
-                        rect.center(),
-                        rect.width() / 2.0,
-                        circle_color,
-                        egui::Stroke::new(1.0, self.theme.button_bg)
-                    );
+                    if ui.is_rect_visible(rect) {
+                        // Draw circular background
+                        let circle_color = if ui.rect_contains_pointer(rect) {
+                            self.theme.button_hover
+                        } else {
+                            self.theme.button_bg
+                        };
+                        
+                        ui.painter().circle(
+                            rect.center(),
+                            rect.width() / 2.0,
+                            circle_color,
+                            egui::Stroke::new(1.0, self.theme.button_bg)
+                        );
 
-                    // Draw settings icon (⚙)
-                    ui.painter().text(
-                        rect.center(),
-                        egui::Align2::CENTER_CENTER,
-                        "⚙",
-                        egui::FontId::proportional(20.0),
-                        self.theme.foreground
-                    );
-                }
+                        // Draw settings icon (⚙) centered in the circle
+                        ui.painter().text(
+                            rect.center(),
+                            egui::Align2::CENTER_CENTER,
+                            "⚙",
+                            egui::FontId::proportional(20.0),
+                            self.theme.foreground
+                        );
+                    }
 
-                if response.clicked() {
-                    self.show_settings = true;
-                }
+                    if response.clicked() {
+                        self.show_settings = true;
+                    }
+                    ui.add_space(16.0);  // Match the spacing from theme toggle
+                });
             });
 
             ui.add_space(8.0);  // Reduced space after settings button
@@ -96,10 +99,6 @@ impl BrowserPicker {
                                     }))
                                 };
                                 
-                                // ui.label(egui::RichText::new(name)
-                                //     .size(20.0)
-                                //     .color(self.theme.foreground));
-                                
                                 if button_response.clicked() {
                                     if let Some((_, browser_path, _)) = self.browsers.get(browser_index) {
                                         if let Err(e) = browser_launcher::launch_browser(browser_path, &self.url) {
@@ -120,6 +119,9 @@ impl BrowserPicker {
         });
     }
 }
+
+
+
 
 
 
