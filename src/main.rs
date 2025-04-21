@@ -9,7 +9,7 @@ mod theme;
 mod ui;
 mod icons;
 
-use app::BrowserPicker;
+use app::Browsea;
 use eframe::egui;
 use std::path::PathBuf;
 
@@ -31,9 +31,9 @@ fn main() {
 
         // Handle the Result returned by run_native
         if let Err(e) = eframe::run_native(
-            "Browser Picker",
+            "Browsea",
             options,
-            Box::new(|cc| Box::new(BrowserPicker::new(cc, url))),
+            Box::new(|cc| Box::new(Browsea::new(cc, url))),
         ) {
             eprintln!("Failed to run application: {}", e);
             std::process::exit(1);

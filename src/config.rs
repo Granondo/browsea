@@ -37,6 +37,6 @@ impl Config {
     fn get_config_path() -> PathBuf {
         let local_app_data = std::env::var("LOCALAPPDATA")
             .unwrap_or_else(|_| ".".to_string());
-        PathBuf::from(local_app_data).join("BrowserPicker").join("config.json")
+        PathBuf::from(local_app_data).join("Browsea").join("config.json")
     }
 } 

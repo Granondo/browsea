@@ -7,7 +7,7 @@ fn main() -> io::Result<()> {
         let mut res = WindowsResource::new();
         
         // Set the manifest file
-        res.set_manifest_file("browser_picker.exe.manifest");
+        res.set_manifest_file("browsea.exe.manifest");
         
         // Set the application icon
         // Try different possible locations for the icon

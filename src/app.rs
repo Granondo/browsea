@@ -4,7 +4,7 @@ use eframe::{egui, epaint};
 use crate::theme::Theme;
 use crate::icons;
 
-pub struct BrowserPicker {
+pub struct Browsea {
     pub browsers: Vec<(String, String, Option<egui::TextureHandle>)>,
     pub url: String,
     pub config: Config,
@@ -15,7 +15,7 @@ pub struct BrowserPicker {
     pub moon_icon: Option<egui::TextureHandle>,
 }
 
-impl BrowserPicker {
+impl Browsea {
     pub fn new(cc: &eframe::CreationContext<'_>, url: String) -> Self {
         // Initialize fonts
         Self::init_custom_fonts(&cc.egui_ctx);
@@ -87,7 +87,7 @@ impl BrowserPicker {
     }
 }
 
-impl eframe::App for BrowserPicker {
+impl eframe::App for Browsea {
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
         let theme = if self.dark_mode { Theme::dark() } else { Theme::light() };
         self.theme = theme.clone(); // Make sure to update the instance theme

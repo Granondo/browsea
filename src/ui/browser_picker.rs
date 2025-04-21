@@ -1,8 +1,8 @@
-use crate::app::BrowserPicker;
+use crate::app::Browsea;
 use crate::browser_launcher;
 use eframe::egui;
 
-impl BrowserPicker {
+impl Browsea {
     pub fn show_browser_picker_ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
         ui.vertical_centered(|ui| {
             // Add settings button at the top right

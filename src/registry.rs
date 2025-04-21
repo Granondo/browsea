@@ -8,8 +8,8 @@ pub fn register_browser() -> Result<(), Box<dyn std::error::Error>> {
     let path_str = path.to_str().unwrap();
 
     // Register as a browser in Windows
-    let (app_key, _) = hkcu.create_subkey(r"Software\Classes\BrowserPicker")?;
-    app_key.set_value("", &"Browser Picker")?;
+    let (app_key, _) = hkcu.create_subkey(r"Software\Classes\Browsea")?;
+    app_key.set_value("", &"Browsea")?;
 
     register_capabilities(&app_key, path_str)?;
     register_client(&hkcu, path_str)?;
@@ -21,12 +21,12 @@ pub fn register_browser() -> Result<(), Box<dyn std::error::Error>> {
 
 fn register_capabilities(app_key: &RegKey, path_str: &str) -> Result<(), Box<dyn std::error::Error>> {
     let (cap_key, _) = app_key.create_subkey(r"Capabilities")?;
-    cap_key.set_value("ApplicationName", &"Browser Picker")?;
+    cap_key.set_value("ApplicationName", &"Browsea")?;
     cap_key.set_value("ApplicationDescription", &"Choose which browser to open links with")?;
 
     let (url_key, _) = cap_key.create_subkey("URLAssociations")?;
-    url_key.set_value("http", &"BrowserPicker")?;
-    url_key.set_value("https", &"BrowserPicker")?;
+    url_key.set_value("http", &"Browsea")?;
+    url_key.set_value("https", &"Browsea")?;
 
     let (cmd_key, _) = app_key.create_subkey(r"shell\open\command")?;
     cmd_key.set_value("", &format!("\"{}\" \"%1\"", path_str))?;
@@ -35,11 +35,11 @@ fn register_capabilities(app_key: &RegKey, path_str: &str) -> Result<(), Box<dyn
 }
 
 fn register_client(hkcu: &RegKey, path_str: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let (client_key, _) = hkcu.create_subkey(r"Software\Clients\StartMenuInternet\BrowserPicker")?;
-    client_key.set_value("", &"Browser Picker")?;
+    let (client_key, _) = hkcu.create_subkey(r"Software\Clients\StartMenuInternet\Browsea")?;
+    client_key.set_value("", &"Browsea")?;
 
     let (client_cap_key, _) = client_key.create_subkey("Capabilities")?;
-    client_cap_key.set_value("ApplicationName", &"Browser Picker")?;
+    client_cap_key.set_value("ApplicationName", &"Browsea")?;
     client_cap_key.set_value("ApplicationDescription", &"Choose which browser to open links with")?;
 
     let (client_cmd_key, _) = client_key.create_subkey(r"shell\open\command")?;
@@ -50,6 +50,6 @@ fn register_client(hkcu: &RegKey, path_str: &str) -> Result<(), Box<dyn std::err
 
 fn register_default_programs(hkcu: &RegKey) -> Result<(), Box<dyn std::error::Error>> {
     let (reg_apps, _) = hkcu.create_subkey(r"Software\RegisteredApplications")?;
-    reg_apps.set_value("BrowserPicker", &r"Software\Classes\BrowserPicker\Capabilities")?;
+    reg_apps.set_value("Browsea", &r"Software\Classes\Browsea\Capabilities")?;
     Ok(())
 } 

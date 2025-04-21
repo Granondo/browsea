@@ -1,5 +1,5 @@
 [package]
-name = "browser_picker"
+name = "browsea"
 version = "0.1.0"
 edition = "2021"
 
@@ -13,7 +13,7 @@ winres = "0.1"
 
 # Add this to make it a Windows GUI application (hides the console window)
 [[bin]]
-name = "browser_picker"
+name = "browsea"
 path = "src/main.rs"
 windows_subsystem = "windows"
 

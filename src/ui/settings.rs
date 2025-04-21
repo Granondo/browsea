@@ -1,8 +1,8 @@
-use crate::app::BrowserPicker;
+use crate::app::Browsea;
 use eframe::egui;
 use rfd::FileDialog;
 
-impl BrowserPicker {
+impl Browsea {
     pub fn show_settings_ui(&mut self, ui: &mut egui::Ui) {
         ui.vertical_centered(|ui| {
             // Header row with back button and theme toggle
@@ -132,7 +132,7 @@ impl BrowserPicker {
                                         );
                                     }
                                     
-                                    ui.add_space(12.0); // Consistent spacing between icon and checkbox
+                                    // ui.add_space(12.0); // Consistent spacing between icon and checkbox
 
                                     // Custom styled checkbox
                                     let checkbox_size = egui::vec2(20.0, 20.0);
@@ -224,6 +224,7 @@ impl BrowserPicker {
         });
     }
 }
+
 
 
 

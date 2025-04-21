@@ -3,10 +3,10 @@
   <assemblyIdentity
       version="1.0.0.0"
       processorArchitecture="*"
-      name="BrowserPicker"
+      name="Browsea"
       type="win32"
   />
-  <description>Browser Picker Application</description>
+  <description>Browsea Application</description>
   <dependency>
     <dependentAssembly>
       <assemblyIdentity
