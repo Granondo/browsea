@@ -90,107 +90,96 @@ impl Browsea {
 
             // Browser visibility section
             ui.heading(
-                egui::RichText::new("BROWSERS")  // Using uppercase for more emphasis
+                egui::RichText::new("BROWSERS")
                     .size(36.0)
-                    // .family(egui::FontFamily::Monospace)  // Using monospace font
-                    // .strong()
-                    // .raised()
                     .color(self.theme.primary)
             );
 
+            ui.add_space(8.0); // Reduced space after heading
 
-            ui.add_space(16.0);
+            // Fixed width container for browser list
+            let browser_list_width = 280.0;
+            egui::Frame::none()
+                .inner_margin(egui::style::Margin::symmetric(0.0, 0.0))
+                .show(ui, |ui| {
+                    ui.set_width(browser_list_width);
+                    
+                    for (name, _, icon) in &self.browsers {
+                        let is_visible = !self.config.hidden_browsers.contains(name);
+                        let mut visible = is_visible;
 
-            let browser_count = &self.browsers.len();
-            let browser_width = 72.0; // Increased for better spacing
-            let total_width = browser_width * (*browser_count as f32);
+                        ui.horizontal(|ui| {
+                            // Icon
+                            if let Some(icon) = icon {
+                                ui.add_sized(
+                                    egui::vec2(24.0, 24.0),
+                                    egui::Image::new(icon, egui::vec2(20.0, 20.0))
+                                );
+                            }
 
-            ui.allocate_ui_with_layout(
-                egui::vec2(ui.available_width(), ui.available_height()),
-                egui::Layout::top_down(egui::Align::Center),
-                |ui| {
-                    ui.horizontal_wrapped(|ui| {
-                        let available_width = ui.available_width();
-                        let padding = (available_width - total_width) / 2.0;
-                        if padding > 0.0 {
-                            ui.add_space(padding);
-                        }
+                            // Name - using a fixed space layout
+                            let label = egui::Label::new(
+                                egui::RichText::new(name)
+                                    .size(14.0)
+                                    .color(self.theme.foreground)
+                            );
+                            ui.add(label);
+                            
+                            // Push checkbox to the right
+                            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                                // Checkbox
+                                let checkbox_size = egui::vec2(18.0, 18.0);
+                                let (rect, response) = ui.allocate_exact_size(checkbox_size, egui::Sense::click());
 
-                        for (name, _, icon) in &self.browsers {
-                            let is_visible = !self.config.hidden_browsers.contains(name);
-                            let mut visible = is_visible;
+                                if response.clicked() {
+                                    visible = !visible;
+                                }
 
-                            ui.horizontal_centered(|ui| {
-                                ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
-                                    ui.add_space(8.0); // Consistent left padding
+                                if ui.is_rect_visible(rect) {
+                                    let stroke = egui::Stroke::new(1.0, self.theme.primary);
+                                    let rounding = 4.0;
 
-                                    // Show browser icon
-                                    if let Some(icon) = icon {
-                                        ui.add_sized(
-                                            egui::vec2(32.0, 32.0),
-                                            egui::Image::new(icon, egui::vec2(24.0, 24.0))
-                                        );
-                                    }
-                                    
-                                    // ui.add_space(12.0); // Consistent spacing between icon and checkbox
+                                    ui.painter().rect(
+                                        rect,
+                                        rounding,
+                                        if visible { self.theme.primary } else { self.theme.button_bg },
+                                        stroke,
+                                    );
 
-                                    // Custom styled checkbox
-                                    let checkbox_size = egui::vec2(20.0, 20.0);
-                                    let (rect, response) = ui.allocate_exact_size(checkbox_size, egui::Sense::click());
-
-                                    if response.clicked() {
-                                        visible = !visible;
-                                    }
-
-                                    // Draw custom checkbox
-                                    if ui.is_rect_visible(rect) {
-                                        let stroke = egui::Stroke::new(1.0, self.theme.primary);
-                                        let rounding = 4.0;
-
-                                        ui.painter().rect(
-                                            rect,
-                                            rounding,
-                                            if visible { self.theme.primary } else { self.theme.button_bg },
-                                            stroke,
-                                        );
-
-                                        if visible {
-                                            // Draw checkmark
-                                            let check_color = self.theme.background;
-                                            let points = [
-                                                rect.min + egui::vec2(5.0, 10.0),
-                                                rect.min + egui::vec2(9.0, 14.0),
-                                                rect.min + egui::vec2(15.0, 6.0),
-                                            ];
-                                            ui.painter().line_segment(
-                                                [points[0], points[1]],
-                                                egui::Stroke::new(2.0, check_color)
-                                            );
-                                            ui.painter().line_segment(
-                                                [points[1], points[2]],
-                                                egui::Stroke::new(2.0, check_color)
-                                            );
-                                        }
-                                    }
-
-                                    ui.add_space(8.0); // Consistent right padding
-                                });
-
-                                if visible != is_visible {
                                     if visible {
-                                        self.config.hidden_browsers.retain(|n| n != name);
-                                    } else {
-                                        self.config.hidden_browsers.push(name.clone());
+                                        let check_color = self.theme.background;
+                                        let points = [
+                                            rect.min + egui::vec2(4.0, 9.0),
+                                            rect.min + egui::vec2(8.0, 13.0),
+                                            rect.min + egui::vec2(14.0, 5.0),
+                                        ];
+                                        ui.painter().line_segment(
+                                            [points[0], points[1]],
+                                            egui::Stroke::new(2.0, check_color)
+                                        );
+                                        ui.painter().line_segment(
+                                            [points[1], points[2]],
+                                            egui::Stroke::new(2.0, check_color)
+                                        );
                                     }
-                                    self.config.save().ok();
                                 }
                             });
-                        }
-                    });
-                },
-            );
+                        });
 
-            ui.add_space(24.0);
+                        if visible != is_visible {
+                            if visible {
+                                self.config.hidden_browsers.retain(|n| n != name);
+                            } else {
+                                self.config.hidden_browsers.push(name.clone());
+                            }
+                            self.config.save().ok();
+                        }
+
+                        ui.add_space(2.0); // Minimal space between rows
+                    }
+                });
+
+            ui.add_space(16.0);
 
             // Add browser button with consistent styling
             if ui.add(egui::Button::new(
@@ -224,37 +213,6 @@ impl Browsea {
         });
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

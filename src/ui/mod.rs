@@ -1,2 +1,2 @@
-mod browser_picker;
+mod browsea;
 mod settings; 
