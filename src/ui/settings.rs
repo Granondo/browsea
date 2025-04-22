@@ -112,8 +112,8 @@ impl Browsea {
                             // Icon
                             if let Some(icon) = icon {
                                 ui.add_sized(
-                                    egui::vec2(24.0, 24.0),
-                                    egui::Image::new(icon, egui::vec2(20.0, 20.0))
+                                    egui::vec2(48.0, 48.0),
+                                    egui::Image::new(icon, egui::vec2(40.0, 40.0))
                                 );
                             }
 
@@ -213,6 +213,7 @@ impl Browsea {
         });
     }
 }
+
 
 
 
