@@ -9,7 +9,7 @@ impl Browsea {
             ui.horizontal(|ui| {
                 // Back button on the left
                 ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
-                    let icon_size = egui::vec2(24.0, 24.0);
+
                     let circle_size = egui::vec2(32.0, 32.0);
                     let (rect, response) = ui.allocate_exact_size(circle_size, egui::Sense::click());
 
@@ -104,8 +104,14 @@ impl Browsea {
                 .show(ui, |ui| {
                     ui.set_width(browser_list_width);
                     
-                    for (name, _, icon) in &self.browsers {
-                        let is_visible = !self.config.hidden_browsers.contains(name);
+                    // Create an index-based iteration
+                    let browser_count = self.browsers.len();
+                    let mut browsers_to_remove = Vec::new();
+
+                    for i in 0..browser_count {
+                        let (name, _, icon) = &self.browsers[i];
+                        let name = name.clone(); // Clone the name for use in closures
+                        let is_visible = !self.config.hidden_browsers.contains(&name);
                         let mut visible = is_visible;
 
                         ui.horizontal(|ui| {
@@ -117,16 +123,60 @@ impl Browsea {
                                 );
                             }
 
-                            // Name - using a fixed space layout
+                            // Name
                             let label = egui::Label::new(
-                                egui::RichText::new(name)
+                                egui::RichText::new(&name)
                                     .size(14.0)
                                     .color(self.theme.foreground)
                             );
                             ui.add(label);
                             
-                            // Push checkbox to the right
+                            // Push checkbox and delete button to the right
                             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                                // Delete button for all browsers
+                                let delete_size = egui::vec2(18.0, 18.0);
+                                let (rect, delete_response) = ui.allocate_exact_size(delete_size, egui::Sense::click());
+
+                                if ui.is_rect_visible(rect) {
+                                    // Draw circle background based on theme
+                                    let circle_color = if ui.rect_contains_pointer(rect) {
+                                        self.theme.button_hover
+                                    } else {
+                                        self.theme.button_bg
+                                    };
+                                    
+                                    ui.painter().circle(
+                                        rect.center(),
+                                        rect.width() / 2.0,
+                                        circle_color,
+                                        egui::Stroke::NONE,
+                                    );
+
+                                    // Draw red X
+                                    let cross_color = egui::Color32::from_rgb(239, 68, 68); // Red color
+                                    let padding = 5.0;
+                                    ui.painter().line_segment(
+                                        [
+                                            rect.min + egui::vec2(padding, padding),
+                                            rect.max - egui::vec2(padding, padding)
+                                        ],
+                                        egui::Stroke::new(2.0, cross_color)
+                                    );
+                                    ui.painter().line_segment(
+                                        [
+                                            egui::pos2(rect.min.x + padding, rect.max.y - padding),
+                                            egui::pos2(rect.max.x - padding, rect.min.y + padding)
+                                        ],
+                                        egui::Stroke::new(2.0, cross_color)
+                                    );
+                                }
+
+                                if delete_response.clicked() {
+                                    browsers_to_remove.push(i);
+                                }
+
+                                ui.add_space(8.0); // Space between delete button and checkbox
+
                                 // Checkbox
                                 let checkbox_size = egui::vec2(18.0, 18.0);
                                 let (rect, response) = ui.allocate_exact_size(checkbox_size, egui::Sense::click());
@@ -168,14 +218,26 @@ impl Browsea {
 
                         if visible != is_visible {
                             if visible {
-                                self.config.hidden_browsers.retain(|n| n != name);
+                                self.config.hidden_browsers.retain(|n| n != &name);
                             } else {
                                 self.config.hidden_browsers.push(name.clone());
                             }
                             self.config.save().ok();
                         }
 
-                        ui.add_space(2.0); // Minimal space between rows
+                        ui.add_space(2.0);
+                    }
+
+                    // Process removals after the loop
+                    if !browsers_to_remove.is_empty() {
+                        // Remove in reverse order to maintain correct indices
+                        for &i in browsers_to_remove.iter().rev() {
+                            let (name, _, _) = &self.browsers[i];
+                            let name = name.clone();
+                            self.browsers.remove(i);
+                            self.config.hidden_browsers.retain(|n| n != &name);
+                        }
+                        self.config.save().ok();
                     }
                 });
 
@@ -213,8 +275,6 @@ impl Browsea {
         });
     }
 }
-
-
 
 
 
